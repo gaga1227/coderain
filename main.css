@@ -1,4 +1,6 @@
 body {
+  color: #000;
+  background: #000;
   position: fixed;
   top: 0;
   left: 0;
@@ -6,4 +8,5 @@ body {
   height: 100%;
   margin: 0;
   padding: 0;
+  overflow: hidden;
 }
