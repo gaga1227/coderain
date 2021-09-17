@@ -9,31 +9,44 @@ const TOTAL_STREAMS = 48;
  * class - Letter
  */
 class Letter {
-  constructor(x, y, d) {
+  constructor({posX, posY, size}) {
+    // TODO: to be passed in from Stream to avoid identical chars next to each other
     this.char = Letter.getChar();
-    this.x = x;
-    this.y = y;
-    this.d = d;
+
+    this.x = posX;
+    this.y = posY;
+    this.size = size;
   }
 
   draw(index) {
-    textSize(this.d);
+    textSize(this.size);
+    strokeWeight(1);
 
+    // TODO: tune to accurate colours
+    // TODO: use stroke to simulate glow?
     if (index === 0) {
       // If it's the first one make it white
       fill(255, 200);
+      stroke(255, 200);
     } else {
       // Otherwise make it green and fade it out more when it's towards then end
       fill(50, 255, 50, 200 - (index * 200) / 25);
+      stroke(50, 255, 50, 200 - (index * 200) / 25);
     }
 
-    text(this.char, this.x * (width / TOTAL_STREAMS), this.y);
+    text(
+      this.char, // char
+      this.x * (width / TOTAL_STREAMS), // x pos // TODO: can be passed down from Stream's x pos
+      this.y // y pos
+    );
   }
 
   switch() {
     this.char = Letter.getChar();
   }
 
+  // return random char from katakana sequence
+  // TODO: should be controlled by Stream so the sequence can be more controlled
   static getChar() {
     return String.fromCharCode(floor(0x30a0 + random(0, 96)));
   }
@@ -43,16 +56,15 @@ class Letter {
  * class - Stream
  */
 class Stream {
-  constructor(x, y, ys) {
-    this.x = x;
-    this.y = y;
-    this.ys = ys * 2;
+  constructor({posX, posY, speed}) {
     this.letters = [];
 
-    // Use the y speed to figure out the diameter
-    // this.d = ys * 2.5
-    this.d = 12;
-    this.spacing = 12;
+    this.x = posX;
+    this.y = posY;
+    this.speed = speed * 2;
+
+    this.letterSize = 12;
+    this.letterSpacing = 12;
 
     this.regenerateLetters();
   }
@@ -60,7 +72,13 @@ class Stream {
   regenerateLetters() {
     this.letters = [];
     for (let i = 0; i < 25; i++) {
-      this.letters.push(new Letter(this.x, this.y - i * this.spacing, this.d));
+      const newLetterConfig = {
+        posX: this.x,
+        posY: this.y - i * this.letterSpacing,
+        size: this.letterSize,
+      };
+      const newLetter = new Letter(newLetterConfig);
+      this.letters.push(newLetter);
     }
   }
 
@@ -69,9 +87,10 @@ class Stream {
     this.update();
 
     // Draw each letter
-    this.letters.forEach((l, i) => l.draw(i));
+    this.letters.forEach((letter, idx) => letter.draw(idx));
 
     // 10% chance to randomly switch a letter
+    // TODO: move threshold to global config
     if (random(1, 100) < 10) {
       this.letters[floor(random(this.letters.length))].switch();
     }
@@ -79,19 +98,24 @@ class Stream {
 
   update() {
     // Add the speed to the stream head position
-    this.y += this.ys;
+    this.y += this.speed;
 
     // If there is enough space to add a letter at the start
-    if (this.y >= this.letters[0].y + this.spacing) {
+    if (this.y >= this.letters[0].y + this.letterSpacing) {
       // Add a new letter at the start
-      this.letters.unshift(new Letter(this.x, this.y, this.d));
+      const newLetterConfig = {
+        posX: this.x,
+        posY: this.y,
+        size: this.letterSize,
+      };
+      this.letters.unshift(new Letter(newLetterConfig));
 
       // Remove the last item
       this.letters.pop();
     }
 
     // If the last character has gone off the screen
-    if (this.letters[this.letters.length - 1].y > height + this.d) {
+    if (this.letters[this.letters.length - 1].y > height + this.letterSize) {
       // Reset the head to the top of the screen
       this.y = 0;
 
@@ -105,28 +129,36 @@ class Stream {
  * Init
  */
 const rainStreams = [];
+let renderer = null;
 
 /**
  * P5 - setup
  */
 function setup() {
-  createCanvas(window.innerWidth, window.innerHeight);
-
+  renderer = createCanvas(window.innerWidth, window.innerHeight);
+  frameRate(24);
   noStroke();
   textStyle(BOLD);
 
-  // Create streams
+  // create all streams
   for (let i = 0; i < TOTAL_STREAMS; i++) {
-    rainStreams.push(new Stream(i, random(1, height), random(2, 10)));
+    const newStreamConfig = {
+      posX: i,
+      posY: random(1, height),
+      speed: random(2, 10),
+    };
+    rainStreams.push(new Stream(newStreamConfig));
   }
 }
 
 /**
  * P5 - draw
+ * - runs continuously after setup()
+ * - frequency controlled by frameRate()
  */
 function draw() {
-  background(0);
-  rainStreams.forEach(s => s.draw());
+  background(0); // pure black bg: 0 - 255
+  rainStreams.forEach(s => s.draw()); // draw all streams
 }
 
 /**
