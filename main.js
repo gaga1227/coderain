@@ -3,7 +3,28 @@
 /**
  * configs
  */
-const TOTAL_STREAMS = 48;
+const getConfigs = () => {
+  const letterSize = 14;
+  const letterSpacing = letterSize * 1.25; // integer
+  const streamDensityXRatio = 0.62;
+  const totalStreams = Math.floor((window.innerWidth / letterSize) * streamDensityXRatio);
+  const speedMin = letterSpacing;
+  const speedMax = speedMin * 4;
+  const streamLength = 24;
+
+  const configs = {
+    FRAMERATE: 24,
+    TOTAL_STREAMS: totalStreams,
+    LETTER_SIZE: letterSize,
+    LETTER_SPACING: letterSpacing,
+    SPEED_MIN: speedMin, // should at least move down one letter step
+    SPEED_MAX: speedMax,
+    STREAM_LENGTH: streamLength, // TODO: should tie to letter colour fading amount
+  };
+  console.log('configs:', configs);
+  return configs;
+};
+let CONFIGS = getConfigs();
 
 /**
  * class - Letter
@@ -36,9 +57,13 @@ class Letter {
 
     text(
       this.char, // char
-      this.x * (width / TOTAL_STREAMS), // x pos // TODO: can be passed down from Stream's x pos
+      this.x * (width / CONFIGS.TOTAL_STREAMS), // x pos // TODO: can be passed down from Stream's x pos
       this.y // y pos
     );
+  }
+
+  moveTo(deltaY = 0) {
+    this.y = deltaY;
   }
 
   switch() {
@@ -56,22 +81,24 @@ class Letter {
  * class - Stream
  */
 class Stream {
-  constructor({posX, posY, speed}) {
+  constructor({posX, posY, speed, streamLength}) {
     this.letters = [];
+    this.streamLength = streamLength;
 
     this.x = posX;
     this.y = posY;
-    this.speed = speed * 2;
+    this.speed = speed;
 
-    this.letterSize = 12;
-    this.letterSpacing = 12;
+    this.letterSize = CONFIGS.LETTER_SIZE;
+    this.letterSpacing = CONFIGS.LETTER_SPACING;
 
+    console.log('speed:', this.speed);
     this.regenerateLetters();
   }
 
   regenerateLetters() {
     this.letters = [];
-    for (let i = 0; i < 25; i++) {
+    for (let i = 0; i < this.streamLength; i++) {
       const newLetterConfig = {
         posX: this.x,
         posY: this.y - i * this.letterSpacing,
@@ -100,21 +127,18 @@ class Stream {
     // Add the speed to the stream head position
     this.y += this.speed;
 
-    // If there is enough space to add a letter at the start
+    // If there is enough space for the stream to move another downward step
+    // this moves the stream downward
     if (this.y >= this.letters[0].y + this.letterSpacing) {
-      // Add a new letter at the start
-      const newLetterConfig = {
-        posX: this.x,
-        posY: this.y,
-        size: this.letterSize,
-      };
-      this.letters.unshift(new Letter(newLetterConfig));
-
-      // Remove the last item
-      this.letters.pop();
+      // update all letters with new posY
+      this.letters.forEach((letter, idx) => {
+        const deltaY = this.y - idx * this.letterSpacing;
+        letter.moveTo(deltaY);
+      });
     }
 
     // If the last character has gone off the screen
+    // this reset the stream back to top of screen
     if (this.letters[this.letters.length - 1].y > height + this.letterSize) {
       // Reset the head to the top of the screen
       this.y = 0;
@@ -126,9 +150,27 @@ class Stream {
 }
 
 /**
+ * initStreams
+ * @returns {[]} - stream list to draw
+ */
+const initStreams = () => {
+  const streamList = [];
+  for (let i = 0; i < CONFIGS.TOTAL_STREAMS; i++) {
+    const newStreamConfig = {
+      posX: i,
+      posY: Math.floor(random(1, height)),
+      speed: Math.round(random(CONFIGS.SPEED_MIN, CONFIGS.SPEED_MAX)),
+      streamLength: CONFIGS.STREAM_LENGTH,
+    };
+    streamList.push(new Stream(newStreamConfig));
+  }
+  return streamList;
+};
+
+/**
  * Init
  */
-const rainStreams = [];
+let rainStreams = null;
 let renderer = null;
 
 /**
@@ -136,19 +178,10 @@ let renderer = null;
  */
 function setup() {
   renderer = createCanvas(window.innerWidth, window.innerHeight);
-  frameRate(24);
+  frameRate(CONFIGS.FRAMERATE);
   noStroke();
   textStyle(BOLD);
-
-  // create all streams
-  for (let i = 0; i < TOTAL_STREAMS; i++) {
-    const newStreamConfig = {
-      posX: i,
-      posY: random(1, height),
-      speed: random(2, 10),
-    };
-    rainStreams.push(new Stream(newStreamConfig));
-  }
+  rainStreams = [...initStreams()];
 }
 
 /**
@@ -165,5 +198,7 @@ function draw() {
  * P5 - windowResized
  */
 function windowResized() {
+  CONFIGS = getConfigs();
+  rainStreams = [...initStreams()];
   resizeCanvas(window.innerWidth, window.innerHeight);
 }
