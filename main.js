@@ -4,22 +4,25 @@
  * configs
  */
 const getConfigs = () => {
-  const letterSize = 14;
-  const letterSpacing = letterSize * 1.25; // integer
+  const winW = window.innerWidth;
+  const letterSize = winW > 600 ? 14 : 12;
+  const letterSpacing = letterSize * 1.5; // integer
   const streamDensityXRatio = 0.62;
   const totalStreams = Math.floor((window.innerWidth / letterSize) * streamDensityXRatio);
-  const speedMin = letterSpacing;
-  const speedMax = speedMin * 4;
+  const speedMin = 6;
+  const speedMax = speedMin * 6;
   const streamLength = 24;
 
   const configs = {
-    FRAMERATE: 24,
+    FRAMERATE: 30,
     TOTAL_STREAMS: totalStreams,
     LETTER_SIZE: letterSize,
     LETTER_SPACING: letterSpacing,
-    SPEED_MIN: speedMin, // should at least move down one letter step
+    SPEED_MIN: speedMin,
     SPEED_MAX: speedMax,
-    STREAM_LENGTH: streamLength, // TODO: should tie to letter colour fading amount
+    STREAM_LENGTH: streamLength,
+    COLOR_FIRST: [200, 255, 200, 255 * 0.8],
+    COLOR_REST: [3, 160, 98],
   };
   console.log('configs:', configs);
   return configs;
@@ -43,16 +46,14 @@ class Letter {
     textSize(this.size);
     strokeWeight(1);
 
-    // TODO: tune to accurate colours
-    // TODO: use stroke to simulate glow?
     if (index === 0) {
-      // If it's the first one make it white
-      fill(255, 200);
-      stroke(255, 200);
+      fill(...CONFIGS.COLOR_FIRST);
+      stroke(...CONFIGS.COLOR_FIRST);
     } else {
-      // Otherwise make it green and fade it out more when it's towards then end
-      fill(50, 255, 50, 200 - (index * 200) / 25);
-      stroke(50, 255, 50, 200 - (index * 200) / 25);
+      // fade it out more when it's towards then end
+      const alpha = 255 - (255 / CONFIGS.STREAM_LENGTH * index);
+      fill(...CONFIGS.COLOR_REST, alpha);
+      stroke(...CONFIGS.COLOR_REST, alpha);
     }
 
     text(
@@ -116,10 +117,13 @@ class Stream {
     // Draw each letter
     this.letters.forEach((letter, idx) => letter.draw(idx));
 
-    // 10% chance to randomly switch a letter
-    // TODO: move threshold to global config
-    if (random(1, 100) < 10) {
-      this.letters[floor(random(this.letters.length))].switch();
+    // always switch a non-first letter
+    const letterToSwitch = floor(random(1, this.letters.length)); // starts from 1
+    this.letters[letterToSwitch].switch();
+
+    // randomly switch first letter
+    if (random(1, 100) < 20) {
+      this.letters[0].switch();
     }
   }
 
@@ -129,13 +133,11 @@ class Stream {
 
     // If there is enough space for the stream to move another downward step
     // this moves the stream downward
-    if (this.y >= this.letters[0].y + this.letterSpacing) {
-      // update all letters with new posY
-      this.letters.forEach((letter, idx) => {
-        const deltaY = this.y - idx * this.letterSpacing;
-        letter.moveTo(deltaY);
-      });
-    }
+    // update all letters with new posY
+    this.letters.forEach((letter, idx) => {
+      const deltaY = this.y - idx * this.letterSpacing;
+      letter.moveTo(deltaY);
+    });
 
     // If the last character has gone off the screen
     // this reset the stream back to top of screen
