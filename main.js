@@ -7,8 +7,8 @@ const getConfigs = () => {
   const winW = window.innerWidth;
   const letterSize = winW > 600 ? 14 : 12;
   const letterSpacing = letterSize * 1.5; // integer
-  const streamDensityXRatio = 0.62;
-  const totalStreams = Math.floor((window.innerWidth / letterSize) * streamDensityXRatio);
+  const streamDensityXRatio = 0.6; // 1 will fill whole screen
+  const totalStreams = Math.floor((winW / letterSize) * streamDensityXRatio);
   const speedMin = 6;
   const speedMax = speedMin * 6;
   const streamLength = 24;
@@ -24,7 +24,6 @@ const getConfigs = () => {
     COLOR_FIRST: [200, 255, 200, 255 * 0.8],
     COLOR_REST: [3, 160, 98],
   };
-  console.log('configs:', configs);
   return configs;
 };
 let CONFIGS = getConfigs();
@@ -33,13 +32,11 @@ let CONFIGS = getConfigs();
  * class - Letter
  */
 class Letter {
-  constructor({posX, posY, size}) {
-    // TODO: to be passed in from Stream to avoid identical chars next to each other
-    this.char = Letter.getChar();
-
+  constructor({posX, posY, size, char}) {
     this.x = posX;
     this.y = posY;
     this.size = size;
+    this.char = char;
   }
 
   draw(index) {
@@ -57,9 +54,9 @@ class Letter {
     }
 
     text(
-      this.char, // char
-      this.x * (width / CONFIGS.TOTAL_STREAMS), // x pos // TODO: can be passed down from Stream's x pos
-      this.y // y pos
+      this.char,
+      this.x,
+      this.y
     );
   }
 
@@ -72,9 +69,17 @@ class Letter {
   }
 
   // return random char from katakana sequence
-  // TODO: should be controlled by Stream so the sequence can be more controlled
+  // TODO: specifically list all allowed chars: katakana, alpha and numerics
   static getChar() {
     return String.fromCharCode(floor(0x30a0 + random(0, 96)));
+  }
+
+  static getNonDuplicateChar(previousChar) {
+    let char = Letter.getChar();
+    while (char === previousChar) {
+      char = Letter.getChar();
+    }
+    return char;
   }
 }
 
@@ -93,17 +98,19 @@ class Stream {
     this.letterSize = CONFIGS.LETTER_SIZE;
     this.letterSpacing = CONFIGS.LETTER_SPACING;
 
-    console.log('speed:', this.speed);
     this.regenerateLetters();
   }
 
   regenerateLetters() {
     this.letters = [];
+
     for (let i = 0; i < this.streamLength; i++) {
+      const previousChar = this.letters[i - 1] ? this.letters[i - 1].char : '';
       const newLetterConfig = {
         posX: this.x,
         posY: this.y - i * this.letterSpacing,
         size: this.letterSize,
+        char: Letter.getNonDuplicateChar(previousChar),
       };
       const newLetter = new Letter(newLetterConfig);
       this.letters.push(newLetter);
@@ -157,15 +164,20 @@ class Stream {
  */
 const initStreams = () => {
   const streamList = [];
+  const posXSlotSize = Math.floor(width / CONFIGS.TOTAL_STREAMS);
+  const posXOffset = (posXSlotSize - CONFIGS.LETTER_SIZE) / 2;
+
   for (let i = 0; i < CONFIGS.TOTAL_STREAMS; i++) {
     const newStreamConfig = {
-      posX: i,
+      posXSlot: i,
+      posX: i * posXSlotSize + posXOffset,
       posY: Math.floor(random(1, height)),
       speed: Math.round(random(CONFIGS.SPEED_MIN, CONFIGS.SPEED_MAX)),
       streamLength: CONFIGS.STREAM_LENGTH,
     };
     streamList.push(new Stream(newStreamConfig));
   }
+
   return streamList;
 };
 
@@ -201,6 +213,7 @@ function draw() {
  */
 function windowResized() {
   CONFIGS = getConfigs();
+
+  renderer = resizeCanvas(window.innerWidth, window.innerHeight);
   rainStreams = [...initStreams()];
-  resizeCanvas(window.innerWidth, window.innerHeight);
 }
