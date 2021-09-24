@@ -5,26 +5,27 @@
  */
 const getConfigs = () => {
   const winW = window.innerWidth;
-  const letterSize = winW > 600 ? 14 : 12;
+  const letterSize = winW > 600 ? 18 : 13;
   const letterSpacing = letterSize * 1.5; // integer
-  const streamDensityXRatio = 0.6; // 1 will fill whole screen
+  const streamDensityXRatio = 0.75; // 1 will fill whole screen
   const totalStreams = Math.floor((winW / letterSize) * streamDensityXRatio);
   const speedMin = 6;
   const speedMax = speedMin * 6;
-  const streamLength = 24;
+  const streamLength = 24; // TODO: based on height?
 
-  const configs = {
-    FRAMERATE: 30,
+  return {
+    DEBUG: true, //false
+    FRAMERATE: 60,
     TOTAL_STREAMS: totalStreams,
     LETTER_SIZE: letterSize,
     LETTER_SPACING: letterSpacing,
     SPEED_MIN: speedMin,
     SPEED_MAX: speedMax,
     STREAM_LENGTH: streamLength,
-    COLOR_FIRST: [200, 255, 200, 255 * 0.8],
+    COLOR_FIRST: [200, 255, 200],
     COLOR_REST: [3, 160, 98],
+    DEPTH_ALPHA_OFFSET_RATIO: 0.4, // 0 (no effect) ~ 1 (full effect): controls how subtle the depth alpha offset is
   };
-  return configs;
 };
 let CONFIGS = getConfigs();
 
@@ -32,25 +33,23 @@ let CONFIGS = getConfigs();
  * class - Letter
  */
 class Letter {
-  constructor({posX, posY, size, char}) {
+  constructor({posX, posY, size, char, depth}) {
     this.x = posX;
     this.y = posY;
     this.size = size;
     this.char = char;
+    this.depth = depth;
   }
 
   draw(index) {
     textSize(this.size);
-    strokeWeight(1);
+    const fillAlpha = this.getFillAlpha(index);
 
     if (index === 0) {
-      fill(...CONFIGS.COLOR_FIRST);
-      stroke(...CONFIGS.COLOR_FIRST);
+      fill(...CONFIGS.COLOR_FIRST, fillAlpha);
     } else {
       // fade it out more when it's towards then end
-      const alpha = 255 - (255 / CONFIGS.STREAM_LENGTH * index);
-      fill(...CONFIGS.COLOR_REST, alpha);
-      stroke(...CONFIGS.COLOR_REST, alpha);
+      fill(...CONFIGS.COLOR_REST, fillAlpha);
     }
 
     text(
@@ -66,6 +65,16 @@ class Letter {
 
   switch() {
     this.char = Letter.getChar();
+  }
+
+  getFillAlpha(charIndex) {
+    const baseAlpha = Math.round(255 * this.depth / CONFIGS.DEPTH_ALPHA_OFFSET_RATIO);
+    const sequentialAlphaOffset = Math.round(baseAlpha / CONFIGS.STREAM_LENGTH * charIndex);
+    const alpha = charIndex === 0
+      ? baseAlpha
+      : baseAlpha - sequentialAlphaOffset;
+
+    return alpha > 0 ? alpha : 0;
   }
 
   // return random char from katakana sequence
@@ -89,16 +98,23 @@ class Letter {
 class Stream {
   constructor({posX, posY, speed, streamLength}) {
     this.letters = [];
-    this.streamLength = streamLength;
+    this.letterSize = CONFIGS.LETTER_SIZE;
+    this.letterSpacing = CONFIGS.LETTER_SPACING;
 
     this.x = posX;
     this.y = posY;
     this.speed = speed;
-
-    this.letterSize = CONFIGS.LETTER_SIZE;
-    this.letterSpacing = CONFIGS.LETTER_SPACING;
+    this.streamLength = streamLength;
+    this.depth = Stream.getDepth(speed);
 
     this.regenerateLetters();
+  }
+
+  // returns simulated z depth ratio for stream based on speed
+  // - fast is closer
+  // - slower is further
+  static getDepth(speed) {
+    return 1 - (speed - CONFIGS.SPEED_MIN) / (CONFIGS.SPEED_MAX - CONFIGS.SPEED_MIN);
   }
 
   regenerateLetters() {
@@ -109,6 +125,7 @@ class Stream {
       const newLetterConfig = {
         posX: this.x,
         posY: this.y - i * this.letterSpacing,
+        depth: this.depth,
         size: this.letterSize,
         char: Letter.getNonDuplicateChar(previousChar),
       };
@@ -184,6 +201,8 @@ const initStreams = () => {
 /**
  * Init
  */
+const debugNode = document.querySelector('#debugNode');
+
 let rainStreams = null;
 let renderer = null;
 
@@ -204,6 +223,10 @@ function setup() {
  * - frequency controlled by frameRate()
  */
 function draw() {
+  if (CONFIGS.DEBUG) {
+    debugNode.textContent = '' + Math.round(frameRate());
+  }
+
   background(0); // pure black bg: 0 - 255
   rainStreams.forEach(s => s.draw()); // draw all streams
 }

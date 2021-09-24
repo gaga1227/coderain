@@ -9,4 +9,17 @@ body {
   margin: 0;
   padding: 0;
   overflow: hidden;
+  font-family: sans-serif;
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 1.5;
+}
+
+#debugNode {
+  position: fixed;
+  top: 0;
+  left: 0;
+  display: inline-flex;
+  background: white;
+  padding: 0 4px;
 }
