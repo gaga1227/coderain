@@ -1,4 +1,7 @@
-// based on concept from https://codepen.io/cahil/pen/OwEeoe/
+/**
+ * constants
+ */
+const GLYPHS = 'qwertyuiopasdfghjklzxcvbnm.:"*<>|123457890-_=+QWERTYUIOP '.split('');
 
 /**
  * configs
@@ -25,9 +28,9 @@ const getConfigs = () => {
     COLOR_FIRST: [200, 255, 200],
     COLOR_REST: [3, 160, 98],
     DEPTH_ALPHA_OFFSET_RATIO: 0.4, // 0 (no effect) ~ 1 (full effect): controls how subtle the depth alpha offset is
+    GLYPHS,
   };
 };
-let CONFIGS = getConfigs();
 
 /**
  * class - Letter
@@ -82,7 +85,8 @@ class Letter {
   // TODO: use font face
   // TODO: use rendered momory buffer instead of chars
   static getChar() {
-    return String.fromCharCode(floor(0x30a0 + random(0, 96)));
+    const charIndex = Math.round(random(0, CONFIGS.GLYPHS.length - 1));
+    return CONFIGS.GLYPHS[charIndex];
   }
 
   static getNonDuplicateChar(previousChar) {
@@ -143,13 +147,15 @@ class Stream {
     // Draw each letter
     this.letters.forEach((letter, idx) => letter.draw(idx));
 
-    // always switch a non-first letter
-    const letterToSwitch = floor(random(1, this.letters.length)); // starts from 1
-    this.letters[letterToSwitch].switch();
-
     // randomly switch first letter
-    if (random(1, 100) < 20) {
+    const randomChance = random(0, 1);
+    if (randomChance < 0.1) {
       this.letters[0].switch();
+    }
+    // randomly switch a non-first letter
+    else if (randomChance < 0.5) {
+      const letterToSwitch = floor(random(1, this.letters.length)); // starts from 1
+      this.letters[letterToSwitch].switch();
     }
   }
 
@@ -205,18 +211,30 @@ const initStreams = () => {
  */
 const debugNode = document.querySelector('#debugNode');
 
+let CONFIGS = null;
 let rainStreams = null;
 let renderer = null;
+let codeFont = null;
+
+/**
+ * P5 - preload
+ */
+function preload() {
+  codeFont = loadFont('assets/matrix-code.ttf');
+}
 
 /**
  * P5 - setup
  */
 function setup() {
+  CONFIGS = getConfigs();
+
   renderer = createCanvas(window.innerWidth, window.innerHeight);
   renderer.id('renderer');
   frameRate(CONFIGS.FRAMERATE);
-  noStroke();
+  textFont(codeFont);
   textStyle(BOLD);
+  noStroke();
   rainStreams = [...initStreams()];
 }
 
