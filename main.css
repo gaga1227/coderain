@@ -23,3 +23,7 @@ body {
   background: white;
   padding: 0 4px;
 }
+
+#renderer {
+  filter: drop-shadow(0 0 12px rgba(3, 160, 98, 0.55)) drop-shadow(0 0 4px rgba(0, 255, 100, 0.9));
+}

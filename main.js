@@ -5,11 +5,11 @@
  */
 const getConfigs = () => {
   const winW = window.innerWidth;
-  const letterSize = winW > 600 ? 18 : 13;
-  const letterSpacing = letterSize * 1.5; // integer
+  const letterSize = winW > 600 ? 15 : 13;
+  const letterSpacing = letterSize * 1.4; // integer
   const streamDensityXRatio = 0.75; // 1 will fill whole screen
   const totalStreams = Math.floor((winW / letterSize) * streamDensityXRatio);
-  const speedMin = 6;
+  const speedMin = 1;
   const speedMax = speedMin * 6;
   const streamLength = 24; // TODO: based on height?
 
@@ -79,6 +79,8 @@ class Letter {
 
   // return random char from katakana sequence
   // TODO: specifically list all allowed chars: katakana, alpha and numerics
+  // TODO: use font face
+  // TODO: use rendered momory buffer instead of chars
   static getChar() {
     return String.fromCharCode(floor(0x30a0 + random(0, 96)));
   }
@@ -211,6 +213,7 @@ let renderer = null;
  */
 function setup() {
   renderer = createCanvas(window.innerWidth, window.innerHeight);
+  renderer.id('renderer');
   frameRate(CONFIGS.FRAMERATE);
   noStroke();
   textStyle(BOLD);
@@ -227,7 +230,7 @@ function draw() {
     debugNode.textContent = '' + Math.round(frameRate());
   }
 
-  background(0); // pure black bg: 0 - 255
+  clear();
   rainStreams.forEach(s => s.draw()); // draw all streams
 }
 
