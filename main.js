@@ -8,13 +8,15 @@ const GLYPHS = 'qwertyuiopasdfghjklzxcvbnm.:"*<>|123457890-_=+QWERTYUIOP '.split
  */
 const getConfigs = () => {
   const winW = window.innerWidth;
+  const winH = window.innerHeight;
   const letterSize = winW > 600 ? 15 : 13;
-  const letterSpacing = letterSize * 1.4; // integer
+  const letterSpacing = letterSize * 1.3;
   const streamDensityXRatio = 0.75; // 1 will fill whole screen
   const totalStreams = Math.floor((winW / letterSize) * streamDensityXRatio);
+  const streamLengthMin = 8;
+  const streamLengthMax = Math.floor((winH / letterSpacing) * streamDensityXRatio);
   const speedMin = 1;
   const speedMax = speedMin * 6;
-  const streamLength = 24; // TODO: based on height?
 
   return {
     DEBUG: true, //false
@@ -24,10 +26,11 @@ const getConfigs = () => {
     LETTER_SPACING: letterSpacing,
     SPEED_MIN: speedMin,
     SPEED_MAX: speedMax,
-    STREAM_LENGTH: streamLength,
+    STREAM_LENGTH_MIN: streamLengthMin,
+    STREAM_LENGTH_MAX: streamLengthMax,
     COLOR_FIRST: [200, 255, 200],
     COLOR_REST: [3, 160, 98],
-    DEPTH_ALPHA_OFFSET_RATIO: 0.4, // 0 (no effect) ~ 1 (full effect): controls how subtle the depth alpha offset is
+    DEPTH_ALPHA_OFFSET_RATIO: 0.5, // 0 (no effect) ~ 1 (full effect): controls how subtle the depth alpha offset is
     GLYPHS,
   };
 };
@@ -36,12 +39,13 @@ const getConfigs = () => {
  * class - Letter
  */
 class Letter {
-  constructor({posX, posY, size, char, depth}) {
+  constructor({posX, posY, size, char, depth, streamLength}) {
     this.x = posX;
     this.y = posY;
     this.size = size;
     this.char = char;
     this.depth = depth;
+    this.streamLength = streamLength;
   }
 
   draw(index) {
@@ -72,7 +76,7 @@ class Letter {
 
   getFillAlpha(charIndex) {
     const baseAlpha = Math.round(255 * this.depth / CONFIGS.DEPTH_ALPHA_OFFSET_RATIO);
-    const sequentialAlphaOffset = Math.round(baseAlpha / CONFIGS.STREAM_LENGTH * charIndex);
+    const sequentialAlphaOffset = Math.round(baseAlpha / this.streamLength * charIndex);
     const alpha = charIndex === 0
       ? baseAlpha
       : baseAlpha - sequentialAlphaOffset;
@@ -81,9 +85,7 @@ class Letter {
   }
 
   // return random char from katakana sequence
-  // TODO: specifically list all allowed chars: katakana, alpha and numerics
-  // TODO: use font face
-  // TODO: use rendered momory buffer instead of chars
+  // TODO: draw from rendered graphic buffer
   static getChar() {
     const charIndex = Math.round(random(0, CONFIGS.GLYPHS.length - 1));
     return CONFIGS.GLYPHS[charIndex];
@@ -116,11 +118,11 @@ class Stream {
     this.regenerateLetters();
   }
 
-  // returns simulated z depth ratio for stream based on speed
+  // returns simulated z depth ratio for stream based on speed (0 ~ 1)
   // - fast is closer
   // - slower is further
   static getDepth(speed) {
-    return 1 - (speed - CONFIGS.SPEED_MIN) / (CONFIGS.SPEED_MAX - CONFIGS.SPEED_MIN);
+    return (speed - CONFIGS.SPEED_MIN) / (CONFIGS.SPEED_MAX - CONFIGS.SPEED_MIN);
   }
 
   regenerateLetters() {
@@ -133,6 +135,7 @@ class Stream {
         posY: this.y - i * this.letterSpacing,
         depth: this.depth,
         size: this.letterSize,
+        streamLength: this.streamLength,
         char: Letter.getNonDuplicateChar(previousChar),
       };
       const newLetter = new Letter(newLetterConfig);
@@ -197,8 +200,8 @@ const initStreams = () => {
       posXSlot: i,
       posX: i * posXSlotSize + posXOffset,
       posY: Math.floor(random(1, height)),
-      speed: Math.round(random(CONFIGS.SPEED_MIN, CONFIGS.SPEED_MAX)),
-      streamLength: CONFIGS.STREAM_LENGTH,
+      streamLength: Math.floor(random(CONFIGS.STREAM_LENGTH_MIN, CONFIGS.STREAM_LENGTH_MAX)),
+      speed: random(CONFIGS.SPEED_MIN, CONFIGS.SPEED_MAX),
     };
     streamList.push(new Stream(newStreamConfig));
   }
