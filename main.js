@@ -9,7 +9,7 @@ const GLYPHS = 'qwertyuiopasdfghjklzxcvbnm.:"*<>|123457890-_=+QWERTYUIOP '.split
 const getConfigs = () => {
   const winW = window.innerWidth;
   const winH = window.innerHeight;
-  const letterSize = winW > 600 ? 15 : 13;
+  const letterSize = winW >= 600 ? 15 : 13;
   const letterSpacing = letterSize * 1.3;
   const streamDensityX = 0.75; // 0 (no effect) ~ 1 (full effect): controls streams density horizontally
   const streamLengthMin = 8;
