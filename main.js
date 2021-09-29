@@ -20,16 +20,20 @@ const getConfigs = () => {
 
   return {
     // main
-    DEBUG: true, //false
+    DEBUG: true,
     FRAMERATE: 60,
+
     // letter
     GLYPHS,
-    COLOR_FIRST: [200, 255, 200],
-    COLOR_REST: [3, 160, 98],
-    DEPTH_ALPHA_OFFSET_RATIO: 0.5, // 0 (no effect) ~ 1 (full effect): controls depth based alpha offset
+    FONT: codeFont.font.names.fontFamily.en,
     LETTER_SIZE: letterSize,
     LETTER_SPACING: letterSpacing,
-    FONT: codeFont.font.names.fontFamily.en,
+    COLOR_FIRST: [200, 255, 200],
+    COLOR_REST: [3, 160, 98],
+    GLOW_COLOR: [0, 255, 100, 0.7],
+    GLOW_LEVEL: letterSize,
+    DEPTH_ALPHA_OFFSET_RATIO: 0.5, // 0 (no effect) ~ 1 (full effect): controls depth based alpha offset
+
     // stream
     STREAM_LENGTH_MIN: streamLengthMin,
     STREAM_LENGTH_MAX: streamLengthMax,
@@ -241,11 +245,21 @@ function preload() {
 function setup() {
   CONFIGS = getConfigs();
 
+  // canvas
   renderer = createCanvas(window.innerWidth, window.innerHeight);
   renderer.id('mainRenderer');
   rendererCtx = renderer.canvas.getContext('2d');
+
+  // global simulated glyph glow
+  // Note: affects render performance, but better than CSS filters
+  rendererCtx.shadowColor = `rgba(${CONFIGS.GLOW_COLOR.join(', ')})`;
+  rendererCtx.shadowBlur = CONFIGS.GLOW_LEVEL;
+
+  // global styles
   frameRate(CONFIGS.FRAMERATE);
   noStroke();
+
+  // set up streams
   rainStreams = [...initStreams()];
 }
 
@@ -274,6 +288,7 @@ const onWindowResize = debounce(() => {
   CONFIGS = getConfigs();
 
   renderer = resizeCanvas(window.innerWidth, window.innerHeight);
+  rendererCtx.shadowBlur = CONFIGS.GLOW_LEVEL;
   rainStreams = [...initStreams()];
 
   // resume continuous drawing
