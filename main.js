@@ -11,27 +11,30 @@ const getConfigs = () => {
   const winH = window.innerHeight;
   const letterSize = winW > 600 ? 15 : 13;
   const letterSpacing = letterSize * 1.3;
-  const streamDensityXRatio = 0.75; // 1 will fill whole screen
-  const totalStreams = Math.floor((winW / letterSize) * streamDensityXRatio);
+  const streamDensityX = 0.75; // 0 (no effect) ~ 1 (full effect): controls streams density horizontally
   const streamLengthMin = 8;
-  const streamLengthMax = Math.floor((winH / letterSpacing) * streamDensityXRatio);
+  const streamLengthMax = Math.floor((winH / letterSpacing) * streamDensityX);
+  const totalStreams = Math.floor((winW / letterSize) * streamDensityX);
   const speedMin = 1;
   const speedMax = speedMin * 6;
 
   return {
+    // main
     DEBUG: true, //false
     FRAMERATE: 60,
-    TOTAL_STREAMS: totalStreams,
-    LETTER_SIZE: letterSize,
-    LETTER_SPACING: letterSpacing,
-    SPEED_MIN: speedMin,
-    SPEED_MAX: speedMax,
-    STREAM_LENGTH_MIN: streamLengthMin,
-    STREAM_LENGTH_MAX: streamLengthMax,
+    // letter
+    GLYPHS,
     COLOR_FIRST: [200, 255, 200],
     COLOR_REST: [3, 160, 98],
-    DEPTH_ALPHA_OFFSET_RATIO: 0.5, // 0 (no effect) ~ 1 (full effect): controls how subtle the depth alpha offset is
-    GLYPHS,
+    DEPTH_ALPHA_OFFSET_RATIO: 0.5, // 0 (no effect) ~ 1 (full effect): controls depth based alpha offset
+    LETTER_SIZE: letterSize,
+    LETTER_SPACING: letterSpacing,
+    // stream
+    STREAM_LENGTH_MIN: streamLengthMin,
+    STREAM_LENGTH_MAX: streamLengthMax,
+    TOTAL_STREAMS: totalStreams,
+    SPEED_MIN: speedMin,
+    SPEED_MAX: speedMax,
   };
 };
 
@@ -48,14 +51,45 @@ class Letter {
     this.streamLength = streamLength;
   }
 
+  // TODO: draw from rendered graphic buffer
+  static getChar() {
+    const charIndex = Math.round(random(0, CONFIGS.GLYPHS.length - 1));
+    return CONFIGS.GLYPHS[charIndex];
+  }
+
+  static getNonDuplicateChar(previousChar) {
+    let char = Letter.getChar();
+    while (char === previousChar) {
+      char = Letter.getChar();
+    }
+    return char;
+  }
+
+  /**
+   * getFillAlpha
+   * @param charIndex - index of char from its stream sequence
+   * @param charDepth - simulated z depth from its stream sequence
+   * @param streamLength - letter sequence's length
+   * @returns {number} - fill alpha value for letter instances
+   */
+  static getFillAlpha(charIndex, charDepth, streamLength) {
+    const baseAlpha = Math.round(255 * charDepth / CONFIGS.DEPTH_ALPHA_OFFSET_RATIO);
+    const sequentialAlphaOffset = Math.round(baseAlpha / streamLength * charIndex);
+    const alpha = charIndex === 0
+      ? baseAlpha
+      : baseAlpha - sequentialAlphaOffset;
+
+    return alpha > 0 ? alpha : 0;
+  }
+
   draw(index) {
     textSize(this.size);
-    const fillAlpha = this.getFillAlpha(index);
 
+    const fillAlpha = Letter.getFillAlpha(index, this.depth, this.streamLength);
     if (index === 0) {
       fill(...CONFIGS.COLOR_FIRST, fillAlpha);
     } else {
-      // fade it out more when it's towards then end
+      // fade the stream sequence towards the end
       fill(...CONFIGS.COLOR_REST, fillAlpha);
     }
 
@@ -73,31 +107,6 @@ class Letter {
   switch() {
     this.char = Letter.getChar();
   }
-
-  getFillAlpha(charIndex) {
-    const baseAlpha = Math.round(255 * this.depth / CONFIGS.DEPTH_ALPHA_OFFSET_RATIO);
-    const sequentialAlphaOffset = Math.round(baseAlpha / this.streamLength * charIndex);
-    const alpha = charIndex === 0
-      ? baseAlpha
-      : baseAlpha - sequentialAlphaOffset;
-
-    return alpha > 0 ? alpha : 0;
-  }
-
-  // return random char from katakana sequence
-  // TODO: draw from rendered graphic buffer
-  static getChar() {
-    const charIndex = Math.round(random(0, CONFIGS.GLYPHS.length - 1));
-    return CONFIGS.GLYPHS[charIndex];
-  }
-
-  static getNonDuplicateChar(previousChar) {
-    let char = Letter.getChar();
-    while (char === previousChar) {
-      char = Letter.getChar();
-    }
-    return char;
-  }
 }
 
 /**
@@ -112,15 +121,19 @@ class Stream {
     this.x = posX;
     this.y = posY;
     this.speed = speed;
-    this.streamLength = streamLength;
     this.depth = Stream.getDepth(speed);
+    this.streamLength = streamLength;
 
     this.regenerateLetters();
   }
 
-  // returns simulated z depth ratio for stream based on speed (0 ~ 1)
-  // - fast is closer
-  // - slower is further
+  /**
+   * getDepth
+   * - fast is closer
+   * - slower is further
+   * @param speed - stream moving speed
+   * @returns {number} - (0 ~ 1) simulated z depth ratio based on speed
+   */
   static getDepth(speed) {
     return (speed - CONFIGS.SPEED_MIN) / (CONFIGS.SPEED_MAX - CONFIGS.SPEED_MIN);
   }
@@ -140,25 +153,6 @@ class Stream {
       };
       const newLetter = new Letter(newLetterConfig);
       this.letters.push(newLetter);
-    }
-  }
-
-  draw() {
-    // Update the position
-    this.update();
-
-    // Draw each letter
-    this.letters.forEach((letter, idx) => letter.draw(idx));
-
-    // randomly switch first letter
-    const randomChance = random(0, 1);
-    if (randomChance < 0.1) {
-      this.letters[0].switch();
-    }
-    // randomly switch a non-first letter
-    else if (randomChance < 0.5) {
-      const letterToSwitch = floor(random(1, this.letters.length)); // starts from 1
-      this.letters[letterToSwitch].switch();
     }
   }
 
@@ -182,6 +176,23 @@ class Stream {
 
       // Regenerate letters as all x values will change
       this.regenerateLetters();
+    }
+  }
+
+  draw() {
+    // Update and draw all letters
+    this.update();
+    this.letters.forEach((letter, idx) => letter.draw(idx));
+
+    // randomly switch first letter
+    const randomChance = random(0, 1);
+    if (randomChance < 0.1) {
+      this.letters[0].switch();
+    }
+    // randomly switch a non-first letter
+    else if (randomChance < 0.5) {
+      const letterToSwitch = floor(random(1, this.letters.length)); // starts from 1
+      this.letters[letterToSwitch].switch();
     }
   }
 }
@@ -236,7 +247,6 @@ function setup() {
   renderer.id('renderer');
   frameRate(CONFIGS.FRAMERATE);
   textFont(codeFont);
-  textStyle(BOLD);
   noStroke();
   rainStreams = [...initStreams()];
 }
@@ -252,7 +262,7 @@ function draw() {
   }
 
   clear();
-  rainStreams.forEach(s => s.draw()); // draw all streams
+  rainStreams.forEach(s => s.draw()); // redraw all streams
 }
 
 /**
