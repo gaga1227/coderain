@@ -29,6 +29,7 @@ const getConfigs = () => {
     DEPTH_ALPHA_OFFSET_RATIO: 0.5, // 0 (no effect) ~ 1 (full effect): controls depth based alpha offset
     LETTER_SIZE: letterSize,
     LETTER_SPACING: letterSpacing,
+    FONT: codeFont.font.names.fontFamily.en,
     // stream
     STREAM_LENGTH_MIN: streamLengthMin,
     STREAM_LENGTH_MAX: streamLengthMax,
@@ -51,7 +52,7 @@ class Letter {
     this.streamLength = streamLength;
   }
 
-  // TODO: draw from rendered graphic buffer
+  // TODO: draw from rendered graphic buffer?
   static getChar() {
     const charIndex = Math.round(random(0, CONFIGS.GLYPHS.length - 1));
     return CONFIGS.GLYPHS[charIndex];
@@ -83,8 +84,6 @@ class Letter {
   }
 
   draw(index) {
-    textSize(this.size);
-
     const fillAlpha = Letter.getFillAlpha(index, this.depth, this.streamLength);
     if (index === 0) {
       fill(...CONFIGS.COLOR_FIRST, fillAlpha);
@@ -93,11 +92,9 @@ class Letter {
       fill(...CONFIGS.COLOR_REST, fillAlpha);
     }
 
-    text(
-      this.char,
-      this.x,
-      this.y
-    );
+    // use native canvas drawing API for better performance
+    rendererCtx.font = `${this.size}px '${CONFIGS.FONT}'`;
+    rendererCtx.fillText(this.char, this.x, this.y);
   }
 
   moveTo(deltaY = 0) {
@@ -226,9 +223,10 @@ const initStreams = () => {
 const debugNode = document.querySelector('#debugNode');
 
 let CONFIGS = null;
-let rainStreams = null;
-let renderer = null;
 let codeFont = null;
+let rainStreams = null;
+let renderer = null; // P5.js renderer
+let rendererCtx = null; // native canvas 2D context
 
 /**
  * P5 - preload
@@ -245,8 +243,8 @@ function setup() {
 
   renderer = createCanvas(window.innerWidth, window.innerHeight);
   renderer.id('mainRenderer');
+  rendererCtx = renderer.canvas.getContext('2d');
   frameRate(CONFIGS.FRAMERATE);
-  textFont(codeFont);
   noStroke();
   rainStreams = [...initStreams()];
 }
@@ -256,9 +254,13 @@ function setup() {
  * - runs continuously after setup()
  * - frequency controlled by frameRate()
  */
+const updateDebugFrameRate = throttle(() => {
+  debugNode.textContent = '' + Math.round(frameRate());
+}, 500);
+
 function draw() {
   if (CONFIGS.DEBUG) {
-    debugNode.textContent = '' + Math.round(frameRate());
+    updateDebugFrameRate();
   }
 
   clear();

@@ -24,6 +24,6 @@ body {
 
 #mainRenderer {
   display: block;
-  /* simulated text glow */
-  filter: drop-shadow(0 0 10px rgba(3, 160, 98, 0.25)) drop-shadow(0 0 4px rgba(0, 255, 100, 0.9));
+  /* simulated text glow: TODO: performance bottleneck */
+  /*filter: drop-shadow(0 0 10px rgba(3, 160, 98, 0.25)) drop-shadow(0 0 4px rgba(0, 255, 100, 0.9));*/
 }
