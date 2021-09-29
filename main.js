@@ -207,7 +207,7 @@ const initStreams = () => {
     const newStreamConfig = {
       posXSlot: i,
       posX: i * posXSlotSize + posXOffset,
-      posY: Math.floor(random(1, height)),
+      posY: CONFIGS.LETTER_SPACING * -2, // so streams will rain down from top edge
       streamLength: Math.floor(random(CONFIGS.STREAM_LENGTH_MIN, CONFIGS.STREAM_LENGTH_MAX)),
       speed: random(CONFIGS.SPEED_MIN, CONFIGS.SPEED_MAX),
     };
@@ -254,13 +254,13 @@ function setup() {
  * - runs continuously after setup()
  * - frequency controlled by frameRate()
  */
-const updateDebugFrameRate = throttle(() => {
+const drawFrameRate = throttle(() => {
   debugNode.textContent = '' + Math.round(frameRate());
 }, 500);
 
 function draw() {
   if (CONFIGS.DEBUG) {
-    updateDebugFrameRate();
+    drawFrameRate();
   }
 
   clear();
@@ -270,9 +270,23 @@ function draw() {
 /**
  * P5 - windowResized
  */
-function windowResized() {
+const onWindowResize = debounce(() => {
   CONFIGS = getConfigs();
 
   renderer = resizeCanvas(window.innerWidth, window.innerHeight);
   rainStreams = [...initStreams()];
+
+  // resume continuous drawing
+  if (!isLooping()) {
+    loop();
+  }
+}, 500);
+
+function windowResized() {
+  // pause continuous drawing
+  if (isLooping()) {
+    noLoop();
+  }
+
+  onWindowResize();
 }
