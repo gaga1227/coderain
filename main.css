@@ -42,7 +42,7 @@ body, .full-layer {
   height: auto;
   max-width: 60%;
   max-height: 60%;
-  margin-left: -1em; /* offset letter spacing */
+  margin-left: 1em; /* offset letter spacing */
   overflow: hidden;
   word-break: break-word;
   font-family: 'Courier Prime', monospace;
