@@ -11,19 +11,19 @@ body {
   overflow: hidden;
   font-family: sans-serif;
   font-size: 16px;
-  font-weight: 600;
-  line-height: 1.5;
 }
 
 #debugNode {
+  display: inline-flex;
   position: fixed;
   top: 0;
   left: 0;
-  display: inline-flex;
   background: white;
   padding: 0 4px;
 }
 
-#renderer {
+#mainRenderer {
+  display: block;
+  /* simulated text glow */
   filter: drop-shadow(0 0 10px rgba(3, 160, 98, 0.25)) drop-shadow(0 0 4px rgba(0, 255, 100, 0.9));
 }

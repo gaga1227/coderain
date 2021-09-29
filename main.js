@@ -244,7 +244,7 @@ function setup() {
   CONFIGS = getConfigs();
 
   renderer = createCanvas(window.innerWidth, window.innerHeight);
-  renderer.id('renderer');
+  renderer.id('mainRenderer');
   frameRate(CONFIGS.FRAMERATE);
   textFont(codeFont);
   noStroke();
