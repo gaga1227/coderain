@@ -1,5 +1,5 @@
 # Code Rain
-A simulation of the digital Code Rain sequence from the movie: The Matrix (1999).
+**A simulation of the digital Code Rain sequence from the movie: The Matrix (1999).**
 
 #### Preview Link:
 https://gaga1227.github.io/_com.ggg.coderain
