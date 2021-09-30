@@ -1,4 +1,4 @@
-# Code Rain
+# CODERAIN
 **A simulation of the digital Code Rain sequence from the movie: The Matrix (1999).**
 
 #### Preview Link:
