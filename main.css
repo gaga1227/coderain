@@ -23,8 +23,9 @@ body, .full-layer {
   position: fixed;
   top: 0;
   left: 0;
+  padding: 2px 4px;
   background: #fff;
-  padding: 0 4px;
+  font-weight: 600;
   z-index: 99;
 }
 

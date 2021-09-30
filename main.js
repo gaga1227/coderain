@@ -56,7 +56,6 @@ class Letter {
     this.streamLength = streamLength;
   }
 
-  // TODO: draw from rendered graphic buffer?
   static getChar() {
     const charIndex = Math.round(random(0, CONFIGS.GLYPHS.length - 1));
     return CONFIGS.GLYPHS[charIndex];
@@ -222,6 +221,16 @@ const initStreams = () => {
 };
 
 /**
+ * Event handlers
+ */
+const handleDocMouseUp = (e) => {
+  rendererCtx.shadowBlur = 0;
+};
+const handleDocMouseDown = (e) => {
+  rendererCtx.shadowBlur = CONFIGS.GLOW_LEVEL;
+};
+
+/**
  * Init
  */
 const debugNode = document.querySelector('#debugNode');
@@ -250,17 +259,24 @@ function setup() {
   renderer.id('mainRenderer');
   rendererCtx = renderer.canvas.getContext('2d');
 
-  // global simulated glyph glow
-  // Note: affects render performance, but better than CSS filters
-  rendererCtx.shadowColor = `rgba(${CONFIGS.GLOW_COLOR.join(', ')})`;
-  rendererCtx.shadowBlur = CONFIGS.GLOW_LEVEL;
-
   // global styles
   frameRate(CONFIGS.FRAMERATE);
   noStroke();
 
+  // global simulated glyph glow
+  // Notes:
+  // - affects render performance, but better than CSS filters
+  // - off when 'shadowBlur' is 0
+  rendererCtx.shadowColor = `rgba(${CONFIGS.GLOW_COLOR.join(', ')})`;
+
   // set up streams
   rainStreams = [...initStreams()];
+
+  // event listeners
+  document.addEventListener('mousedown', handleDocMouseDown);
+  document.addEventListener('touchstart', handleDocMouseDown);
+  document.addEventListener('mouseup', handleDocMouseUp);
+  document.addEventListener('touchend', handleDocMouseUp);
 }
 
 /**
@@ -288,7 +304,6 @@ const onWindowResize = debounce(() => {
   CONFIGS = getConfigs();
 
   renderer = resizeCanvas(window.innerWidth, window.innerHeight);
-  rendererCtx.shadowBlur = CONFIGS.GLOW_LEVEL;
   rainStreams = [...initStreams()];
 
   // resume continuous drawing
