@@ -1,0 +1,16 @@
+{
+  "name": "coderain",
+  "version": "1.0.0",
+  "description": "A simulation of the digital Code Rain sequence from The Matrix (1999).",
+  "author": "Johnny Xu",
+  "license": "ISC",
+  "homepage": "https://gaga1227.github.io/_com.ggg.coderain/?msg=coderain",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/gaga1227/_com.ggg.coderain"
+  },
+  "main": "main.js",
+  "scripts": {
+    "test": ""
+  }
+}
