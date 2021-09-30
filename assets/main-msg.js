@@ -57,11 +57,11 @@
   const applyDefaultMsg = () => {
     // try get message from search query param
     const searchParams = new URLSearchParams(win.location.search);
-    const searchMsgText = searchParams.get(MSG_PARAM) || '';
+    const searchMsgText = searchParams.get(MSG_PARAM);
     // try get message from LS
-    const lsMsgText = localStorage.getItem(MSG_LS_KEY) || '';
+    const lsMsgText = localStorage.getItem(MSG_LS_KEY);
 
-    applyMsg(searchMsgText || lsMsgText);
+    applyMsg(searchMsgText || lsMsgText || '');
   };
 
   /**
