@@ -13,13 +13,23 @@
    * Constants
    */
   const MSG_PARAM = 'msg';
+  const MSG_LS_KEY = 'coderain-msg';
 
   /**
    * View utils
    */
   const applyMsg = (msg = '') => {
-    if (typeof msg === 'string' && msg.trim().length >= 0) {
-      msgNode.textContent = msg;
+    if (typeof msg !== 'string') {
+      return;
+    }
+
+    const msgText = msg.trim();
+    msgNode.textContent = msgText;
+
+    if (msgText.length === 0) {
+      localStorage.removeItem(MSG_LS_KEY);
+    } else {
+      localStorage.setItem(MSG_LS_KEY, msgText);
     }
   };
   const clearMsg = () => {
@@ -45,13 +55,13 @@
     }
   };
   const applyDefaultMsg = () => {
-    let msgText;
-
-    // try get message from query param
+    // try get message from search query param
     const searchParams = new URLSearchParams(win.location.search);
-    msgText = searchParams.get(MSG_PARAM) || '';
+    const searchMsgText = searchParams.get(MSG_PARAM) || '';
+    // try get message from LS
+    const lsMsgText = localStorage.getItem(MSG_LS_KEY) || '';
 
-    applyMsg(msgText);
+    applyMsg(searchMsgText || lsMsgText);
   };
 
   /**
