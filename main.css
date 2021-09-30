@@ -5,6 +5,13 @@ html, body {
   background: #000;
   font-family: sans-serif;
   font-size: 16px;
+
+  /* disable touch selection */
+  -webkit-touch-callout: none; /* Safari */
+  -webkit-user-select: none; /* Chrome */
+  -moz-user-select: none; /* Firefox */
+  -ms-user-select: none; /* Internet Explorer/Edge */
+  user-select: none;
 }
 
 body, .full-layer {
