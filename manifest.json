@@ -2,7 +2,7 @@
   "name": "CODERAIN",
   "short_name": "CODERAIN",
   "description": "CODERAIN is a simulation of the digital Code Rain sequence from The Matrix (1999).",
-  "start_url": "./?msg=coderain",
+  "start_url": "./",
   "orientation": "portrait",
   "display": "standalone",
   "background_color": "#000000",
