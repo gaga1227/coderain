@@ -2,7 +2,7 @@
 **A simulation of the digital Code Rain sequence from the movie: The Matrix (1999).**
 
 #### Preview Link:
-https://gaga1227.github.io/_com.ggg.coderain
+https://gaga1227.github.io/_com.ggg.coderain/?msg=coderain
 
 ----
 ##### Credits and References:
