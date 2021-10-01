@@ -232,9 +232,11 @@ const initStreams = () => {
 const handleDocMouseUp = (e) => {
   // debug
   mouseupCount += 1;
-  if (mouseupCount >= CONFIGS.DEBUG_TRESH) CONFIGS.DEBUG = true;
-  debugNode.setAttribute('data-enabled', 'true');
-  
+  if (mouseupCount >= CONFIGS.DEBUG_TRESH) {
+    CONFIGS.DEBUG = true;
+    debugNode.setAttribute('data-enabled', 'true');
+  }
+
   // FireFox crashes with 'shadowBlur', disabled
   !ENV.isFirefox && (rendererCtx.shadowBlur = 0);
 };
