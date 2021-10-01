@@ -26,7 +26,7 @@ body, .full-layer {
 }
 
 #debugNode {
-  display: inline-flex;
+  display: none;
   align-items: center;
   justify-content: center;
   position: fixed;
@@ -39,6 +39,9 @@ body, .full-layer {
   font-weight: 600;
   line-height: 1;
   z-index: 99;
+}
+#debugNode[data-enabled="true"] {
+  display: inline-flex;
 }
 #debugNode::before {
   content: 'FPS:';
