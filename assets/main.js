@@ -332,3 +332,10 @@ function windowResized() {
 
   onWindowResize();
 }
+
+/**
+ * P5 - deviceShaken
+ */
+function deviceShaken() {
+  MSG.clearMsg();
+}

@@ -16,7 +16,7 @@
   const MSG_LS_KEY = 'coderain-msg';
 
   /**
-   * View utils
+   * View helpers
    */
   const applyMsg = (msg = '') => {
     if (typeof msg !== 'string') {
@@ -60,7 +60,7 @@
     const searchMsgText = searchParams.get(MSG_PARAM); // null|string
     // try get message from LS
     const lsMsgText = localStorage.getItem(MSG_LS_KEY); // null|string
-    
+
     let msgText;
     if (searchMsgText === null) {
       msgText = lsMsgText || '';
@@ -107,6 +107,11 @@
     // register message inputs
     doc.addEventListener('keyup', handleGlobalKeyUp);
     doc.addEventListener('keydown', handleGlobalKeyDown);
+
+    // return module interface
+    win.MSG = win.MSG || {};
+    win.MSG.applyMsg = applyMsg;
+    win.MSG.clearMsg = clearMsg;
   };
   init();
 })();
