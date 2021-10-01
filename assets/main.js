@@ -24,7 +24,8 @@ const getConfigs = () => {
 
   return {
     // main
-    DEBUG: true,
+    DEBUG: false,
+    DEBUG_TRESH: 8,
     FRAMERATE: 60,
     SHAKEN_THRESH: 30,
 
@@ -229,6 +230,11 @@ const initStreams = () => {
  * Event handlers
  */
 const handleDocMouseUp = (e) => {
+  // debug
+  mouseupCount += 1;
+  if (mouseupCount >= CONFIGS.DEBUG_TRESH) CONFIGS.DEBUG = true;
+  debugNode.setAttribute('data-enabled', 'true');
+  
   // FireFox crashes with 'shadowBlur', disabled
   !ENV.isFirefox && (rendererCtx.shadowBlur = 0);
 };
@@ -240,6 +246,7 @@ const handleDocMouseDown = (e) => {
 /**
  * Init
  */
+// TODO: move global vars inside an object
 const debugNode = document.querySelector('#debugNode');
 
 let CONFIGS = null;
@@ -247,6 +254,7 @@ let codeFont = null;
 let rainStreams = null;
 let renderer = null; // P5.js renderer
 let rendererCtx = null; // native canvas 2D context
+let mouseupCount = 0; // used for debug
 
 /**
  * P5 - preload
@@ -342,4 +350,9 @@ function deviceShaken() {
   // reset view
   MSG.clearMsg();
   rainStreams = [...initStreams()];
+  
+  // reset debug
+  mouseupCount = 0;
+  CONFIGS.DEBUG = false;
+  debugNode.removeAttribute('data-enabled');
 }
