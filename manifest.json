@@ -4,7 +4,7 @@
   "description": "CODERAIN is a simulation of the digital Code Rain sequence from The Matrix (1999).",
   "start_url": "./",
   "orientation": "portrait",
-  "display": "standalone",
+  "display": "fullscreen",
   "background_color": "#000000",
   "theme_color": "#000000",
   "prompt_message": "Add a Home screen icon for easy access to CODERAIN",
