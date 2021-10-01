@@ -31,3 +31,14 @@ const debounce = (func, wait, immediate) => {
     if (immediate && !timeout) func.apply(context, args);
   };
 };
+
+/**
+ * Env helpers
+ */
+const isTouchDevice = () => {
+  return !!document && ('ontouchstart' in window || ('DocumentTouch' in window && document instanceof DocumentTouch));
+};
+const isFirefox = () => {
+  const userAgent = (navigator && navigator.userAgent || '').toLowerCase();
+  return userAgent.match(/(?:firefox|fxios)\/(\d+)/) !== null;
+};

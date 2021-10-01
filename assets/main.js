@@ -1,6 +1,10 @@
 /**
  * constants
  */
+const ENV = {
+  isFirefox: isFirefox(),
+  isTouchDevice: isTouchDevice(),
+};
 const GLYPHS = 'qwertyuiopasdfghjklzxcvbnm.:"*<>|123457890-_=+QWERTYUIOP '.split('');
 
 /**
@@ -224,10 +228,10 @@ const initStreams = () => {
  * Event handlers
  */
 const handleDocMouseUp = (e) => {
-  rendererCtx.shadowBlur = 0;
+  !ENV.isFirefox && (rendererCtx.shadowBlur = 0);
 };
 const handleDocMouseDown = (e) => {
-  rendererCtx.shadowBlur = CONFIGS.GLOW_LEVEL;
+  !ENV.isFirefox && (rendererCtx.shadowBlur = CONFIGS.GLOW_LEVEL);
 };
 
 /**
@@ -267,16 +271,21 @@ function setup() {
   // Notes:
   // - affects render performance, but better than CSS filters
   // - off when 'shadowBlur' is 0
-  rendererCtx.shadowColor = `rgba(${CONFIGS.GLOW_COLOR.join(', ')})`;
+  !ENV.isFirefox && (rendererCtx.shadowColor = `rgba(${CONFIGS.GLOW_COLOR.join(', ')})`);
 
   // set up streams
   rainStreams = [...initStreams()];
 
   // event listeners
-  document.addEventListener('mousedown', handleDocMouseDown);
-  document.addEventListener('touchstart', handleDocMouseDown);
-  document.addEventListener('mouseup', handleDocMouseUp);
-  document.addEventListener('touchend', handleDocMouseUp);
+  if (ENV.isTouchDevice) {
+    document.addEventListener('touchstart', handleDocMouseDown);
+    document.addEventListener('touchend', handleDocMouseUp);
+    document.addEventListener('touchcancel', handleDocMouseUp);
+  } else {
+    document.addEventListener('mousedown', handleDocMouseDown);
+    document.addEventListener('mouseup', handleDocMouseUp);
+    document.addEventListener('mouseout', handleDocMouseUp);
+  }
 }
 
 /**
