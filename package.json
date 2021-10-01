@@ -10,7 +10,5 @@
     "url": "https://github.com/gaga1227/_com.ggg.coderain"
   },
   "main": "main.js",
-  "scripts": {
-    "test": ""
-  }
+  "scripts": {}
 }
