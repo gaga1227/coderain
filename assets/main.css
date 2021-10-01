@@ -27,13 +27,21 @@ body, .full-layer {
 
 #debugNode {
   display: inline-flex;
+  align-items: center;
+  justify-content: center;
   position: fixed;
   top: 0;
   left: 0;
-  padding: 2px 4px;
-  background: #fff;
+  padding: 3px 2px 2px;
+  color: #000;
+  background: rgb(3, 160, 98);
+  font-family: 'Courier Prime', monospace;
   font-weight: 600;
+  line-height: 1;
   z-index: 99;
+}
+#debugNode::before {
+  content: 'FPS:';
 }
 
 #contentNode {
