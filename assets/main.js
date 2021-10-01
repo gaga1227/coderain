@@ -26,7 +26,7 @@ const getConfigs = () => {
     // main
     DEBUG: true,
     FRAMERATE: 60,
-    SHAKEN_THRESH: 35,
+    SHAKEN_THRESH: 30,
 
     // letter
     GLYPHS,
