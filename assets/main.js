@@ -26,6 +26,7 @@ const getConfigs = () => {
     // main
     DEBUG: true,
     FRAMERATE: 60,
+    SHAKEN_THRESH: 50,
 
     // letter
     GLYPHS,
@@ -265,7 +266,8 @@ function setup() {
   renderer.id('mainRenderer');
   rendererCtx = renderer.canvas.getContext('2d');
 
-  // global styles
+  // global P5 setups
+  setShakeThreshold(CONFIGS.SHAKEN_THRESH);
   frameRate(CONFIGS.FRAMERATE);
   noStroke();
 
@@ -337,5 +339,7 @@ function windowResized() {
  * P5 - deviceShaken
  */
 function deviceShaken() {
+  // reset view
   MSG.clearMsg();
+  rainStreams = [...initStreams()];
 }
