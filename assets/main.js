@@ -250,6 +250,12 @@ const handleDocMouseDown = (e) => {
  */
 // TODO: move global vars inside an object
 const debugNode = document.querySelector('#debugNode');
+debugNode.addEventListener('click', () => {
+  // reset debug
+  mouseupCount = 0;
+  CONFIGS.DEBUG = false;
+  debugNode.removeAttribute('data-enabled');
+});
 
 let CONFIGS = null;
 let codeFont = null;
