@@ -228,9 +228,11 @@ const initStreams = () => {
  * Event handlers
  */
 const handleDocMouseUp = (e) => {
+  // FireFox crashes with 'shadowBlur', disabled
   !ENV.isFirefox && (rendererCtx.shadowBlur = 0);
 };
 const handleDocMouseDown = (e) => {
+  // FireFox crashes with 'shadowBlur', disabled
   !ENV.isFirefox && (rendererCtx.shadowBlur = CONFIGS.GLOW_LEVEL);
 };
 
@@ -271,6 +273,7 @@ function setup() {
   // Notes:
   // - affects render performance, but better than CSS filters
   // - off when 'shadowBlur' is 0
+  // - FireFox crashes with 'shadowBlur', disabled
   !ENV.isFirefox && (rendererCtx.shadowColor = `rgba(${CONFIGS.GLOW_COLOR.join(', ')})`);
 
   // set up streams
