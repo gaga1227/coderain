@@ -1,10 +1,10 @@
 # CODERAIN
 **A simulation of the digital Code Rain sequence from the movie: The Matrix (1999).**
 
-![animated preview of CODERAIN](https://gaga1227.github.io/_com.ggg.coderain/preview.gif "CODERAIN")
+![animated preview of CODERAIN](https://gaga1227.github.io/coderain/preview.gif "CODERAIN")
 
 ### Preview Link:
-https://gaga1227.github.io/_com.ggg.coderain/?msg=coderain
+https://gaga1227.github.io/coderain/?msg=coderain
 
 ### Usages:
 * Supports 'Add to Home Screen' on mobile devices;
