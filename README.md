@@ -7,7 +7,7 @@
 https://gaga1227.github.io/coderain/?msg=coderain
 
 ### Usages:
-* Supports 'Add to Home Screen' on mobile devices;
+* Supports 'Add to Home screen' on mobile devices;
 * Can display a text message on screen via keyboard, or search query param; e.g. `?msg=coderain`
 * Hitting 'ESC' key will clear any on screen message text;
 * Clicking/tapping on screen will toggle through all different settings presets;
