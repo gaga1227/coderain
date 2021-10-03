@@ -3,8 +3,15 @@
 
 ![animated preview of CODERAIN](https://gaga1227.github.io/_com.ggg.coderain/preview.gif "CODERAIN")
 
-#### Preview Link:
+### Preview Link:
 https://gaga1227.github.io/_com.ggg.coderain/?msg=coderain
+
+### Usages:
+* Supports 'Add to Home Screen' on mobile devices;
+* Can display a text message on screen via keyboard, or search query param; e.g. `?msg=coderain`
+* Hitting 'ESC' key will clear any on screen message text;
+* Clicking/tapping on screen will toggle through all different settings presets;
+* Resizing viewport, or shaking your mobile devices (Android) will reset the code rain streams;
 
 ----
 ##### Credits and References:
