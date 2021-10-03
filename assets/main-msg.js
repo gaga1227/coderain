@@ -14,6 +14,12 @@
    */
   const MSG_PARAM = 'msg';
   const MSG_LS_KEY = 'coderain-msg';
+  const PROMPT_TIMEOUT = 2500;
+
+  /**
+   * vars
+   */
+  let promptMsgTimeout = null;
 
   /**
    * View helpers
@@ -69,6 +75,18 @@
     }
     applyMsg(msgText);
   };
+  const promptMsgCB = () => {
+    clearMsg();
+    promptMsgTimeout = null;
+  };
+  const promptMsg = (msg = '') => {
+    if (typeof msg !== 'string' || !msg.trim().length) {
+      return;
+    }
+    clearTimeout(promptMsgTimeout);
+    applyMsg(msg);
+    promptMsgTimeout = setTimeout(promptMsgCB, PROMPT_TIMEOUT);
+  };
 
   /**
    * Event handlers
@@ -112,6 +130,7 @@
     win.MSG = win.MSG || {};
     win.MSG.applyMsg = applyMsg;
     win.MSG.clearMsg = clearMsg;
+    win.MSG.promptMsg = promptMsg;
   };
   init();
 })();

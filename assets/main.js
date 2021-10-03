@@ -8,6 +8,29 @@ const ENV = {
 const GLYPHS = 'qwertyuiopasdfghjklzxcvbnm.:"*<>|123457890-_=+QWERTYUIOP '.split('');
 
 /**
+ * settings
+ */
+const SETTINGS = [
+  {speed: 1, prompt: 'default'}, // default
+  {speed: 1.6, prompt: 'warming up'},
+  {speed: 3, prompt: 'let it rain'},
+  {speed: 6, prompt: 'john wick'},
+  {speed: 12, prompt: 'warp'},
+];
+const prevSetting = () => {
+  const currentSetting = CONFIGS.SETTING;
+  CONFIGS.SETTING = currentSetting === 0 ? SETTINGS.length - 1 : currentSetting - 1;
+  MSG.promptMsg(SETTINGS[CONFIGS.SETTING].prompt);
+  return CONFIGS.SETTING;
+};
+const nextSetting = () => {
+  const currentSetting = CONFIGS.SETTING;
+  CONFIGS.SETTING = (currentSetting === SETTINGS.length - 1) ? 0 : currentSetting + 1;
+  MSG.promptMsg(SETTINGS[CONFIGS.SETTING].prompt);
+  return CONFIGS.SETTING;
+};
+
+/**
  * configs
  */
 const getConfigs = () => {
@@ -27,6 +50,9 @@ const getConfigs = () => {
     DEBUG: false,
     FRAMERATE: 60,
     SHAKEN_THRESH: 30,
+
+    // setting
+    SETTING: 0,
 
     // letter
     GLYPHS,
@@ -143,6 +169,14 @@ class Stream {
     return (speed - CONFIGS.SPEED_MIN) / (CONFIGS.SPEED_MAX - CONFIGS.SPEED_MIN);
   }
 
+  /**
+   * getSpeed
+   * @param speed - stream default speed value
+   */
+  static getSpeed(speed) {
+    return speed * SETTINGS[CONFIGS.SETTING].speed;
+  }
+
   regenerateLetters() {
     this.letters = [];
 
@@ -163,7 +197,7 @@ class Stream {
 
   update() {
     // Add the speed to the stream head position
-    this.y += this.speed;
+    this.y += Stream.getSpeed(this.speed);
 
     // If there is enough space for the stream to move another downward step
     // this moves the stream downward
@@ -236,11 +270,16 @@ const handleDocMouseDown = (e) => {
   // FireFox crashes with 'shadowBlur', disabled
   !ENV.isFirefox && (rendererCtx.shadowBlur = CONFIGS.GLOW_LEVEL);
 };
+const handleDocClick = (e) => {
+  // TODO: use 'prevSetting' depends on screen location
+  nextSetting();
+};
 
 /**
  * Debug
  */
-const handleDebugNodeClick = () => {
+const handleDebugNodeClick = (e) => {
+  e.stopPropagation();
   CONFIGS.DEBUG = !CONFIGS.DEBUG;
   debugNode.setAttribute('data-enabled', CONFIGS.DEBUG ? 'true' : 'false');
 };
@@ -300,6 +339,7 @@ function setup() {
     document.addEventListener('mouseup', handleDocMouseUp);
     document.addEventListener('mouseout', handleDocMouseUp);
   }
+  document.addEventListener('click', handleDocClick);
 }
 
 /**
@@ -348,6 +388,9 @@ function windowResized() {
  * P5 - deviceShaken
  */
 function deviceShaken() {
+  // reset setting
+  CONFIGS.SETTING = 0;
+
   // reset view
   MSG.clearMsg();
   rainStreams = [...initStreams()];
