@@ -349,6 +349,9 @@ function setup() {
  */
 const drawFrameRate = throttle(() => {
   debugNode.textContent = '' + Math.round(frameRate());
+  
+  console.log('mouseX', mouseX);
+  console.log('mouseY', mouseY);
 }, 500);
 
 
