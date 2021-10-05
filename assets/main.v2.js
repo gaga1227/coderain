@@ -385,7 +385,7 @@ function draw() {
   // Rotations
   const rX = mouseX / window.innerWidth;
   const rY = mouseY / window.innerHeight;
-  renderer.elt.style.transform = `perspective(50em) rotationX(${getRotationX(rX)}deg) rotationY(${getRotationY(rY)}deg)`;
+  renderer.elt.style.transform = `perspective(50em) rotateX(${getRotationX(rX)}deg) rotateY(${getRotationY(rY)}deg)`;
   renderer.elt.style.transformOrigin = `${getTrasformOriginX(rY)}% ${getTrasformOriginY(rX)}%`;
 }
 
