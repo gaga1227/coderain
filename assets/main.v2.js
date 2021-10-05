@@ -356,10 +356,16 @@ const drawFrameRate = throttle(() => {
  * Rotations
  */
 const getTrasformOriginX = (rY) => {
-  return Math.round(rY * 100);
+  const pct = Math.round(rY * 100);
+  if (pct) < 0 pct = 0;
+  if (pct) > 100 pct = 100;
+  return pct;
 }
 const getTrasformOriginY = (rX) => {
-  return Math.round(rX * 100);
+  const pct = Math.round(rX * 100);
+  if (pct) < 0 pct = 0;
+  if (pct) > 100 pct = 100;
+  return pct;
 }
 const getRotationX = (rX) => {
   return Math.round(rX * 40) - 20;
@@ -379,7 +385,7 @@ function draw() {
   // Rotations
   const rX = mouseX / window.innerWidth;
   const rY = mouseY / window.innerHeight;
-  renderer.elt.style.transform = `perspective(50em) rotationX(${getRotationX(rX)}deg) rotationX(${getRotationY(rY)}deg)`;
+  renderer.elt.style.transform = `perspective(50em) rotationX(${getRotationX(rX)}deg) rotationY(${getRotationY(rY)}deg)`;
   renderer.elt.style.transformOrigin = `${getTrasformOriginX(rY)}% ${getTrasformOriginY(rX)}%`;
 }
 
