@@ -300,7 +300,7 @@ let rendererCtx = null; // native canvas 2D context
  * P5 - preload
  */
 function preload() {
-  codeFont = loadFont('assets/matrix-code.ttf');
+  codeFont = loadFont('../assets/matrix-code.ttf');
 }
 
 /**
