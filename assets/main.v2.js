@@ -363,8 +363,8 @@ const getTrasformOriginX = (rY) => {
 }
 const getTrasformOriginY = (rX) => {
   const pct = Math.round(rX * 100);
-  if (pct) < 0 pct = 0;
-  if (pct) > 100 pct = 100;
+  if (pct < 0) pct = 0;
+  if (pct > 100) pct = 100;
   return pct;
 }
 const getRotationX = (rX) => {
