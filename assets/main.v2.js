@@ -362,15 +362,15 @@ const getTrasformOriginX = (rY) => {
   return pct;
 }
 const getTrasformOriginY = (rX) => {
-  let pct = Math.round(rX * 100);
+  let pct = Math.round((1 - rX) * 100);
   if (pct < 0) pct = 0;
   if (pct > 100) pct = 100;
   return pct;
 }
-const getRotationX = (rX) => {
+const getRotateX = (rX) => {
   return Math.round(rX * 40) - 20;
 }
-const getRotationY = (rY) => {
+const getRotateY = (rY) => {
   return Math.round(rY * 40) - 20;
 }
 
@@ -385,7 +385,7 @@ function draw() {
   // Rotations
   const rX = mouseX / window.innerWidth;
   const rY = mouseY / window.innerHeight;
-  renderer.elt.style.transform = `perspective(50em) rotateX(${getRotationX(rX)}deg) rotateY(${getRotationY(rY)}deg)`;
+  renderer.elt.style.transform = `perspective(50em) rotateX(${getRotateX(rX)}deg) rotateY(${getRotateY(rY)}deg)`;
   renderer.elt.style.transformOrigin = `${getTrasformOriginX(rY)}% ${getTrasformOriginY(rX)}%`;
 }
 
