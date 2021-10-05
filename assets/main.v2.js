@@ -351,6 +351,23 @@ const drawFrameRate = throttle(() => {
   debugNode.textContent = '' + Math.round(frameRate());
 }, 500);
 
+
+/**
+ * Rotations
+ */
+const getTrasformOriginX = (rY) => {
+  return Math.round(rY * 100);
+}
+const getTrasformOriginY = (rX) => {
+  return Math.round(rX * 100);
+}
+const getRotationX = (rX) => {
+  return Math.round(rX * 40) - 20;
+}
+const getRotationY = (rY) => {
+  return Math.round(rY * 40) - 20;
+}
+
 function draw() {
   if (CONFIGS.DEBUG) {
     drawFrameRate();
@@ -358,6 +375,12 @@ function draw() {
 
   clear();
   rainStreams.forEach(s => s.draw()); // redraw all streams
+  
+  // Rotations
+  const rX = mouseX / window.innerWidth;
+  const rY = mouseY / window.innerHeight;
+  renderer.elt.style.transform = `perspective(50em) rotationX(${getRotationX(rX)}deg) rotationX(${getRotationY(rY)}deg)`;
+  renderer.elt.style.transformOrigin = `${getTrasformOriginX(rY)}% ${getTrasformOriginY(rX)}%`;
 }
 
 /**
