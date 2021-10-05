@@ -83,5 +83,8 @@ body, .full-layer {
 }
 
 #mainRenderer {
+  background: #00FFFF;
   display: block;
+  backface-visibility: hidden;
+  perspective: 50em;
 }
