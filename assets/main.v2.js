@@ -368,10 +368,16 @@ const getTrasformOriginY = (rX) => {
   return pct;
 }
 const getRotateX = (rX) => {
-  return Math.round(rX * 40) - 20;
+  let deg = Math.round(rX * 40);
+  if (deg < 0) deg = 0;
+  if (deg > 40) deg = 40;
+  return deg - 20;
 }
 const getRotateY = (rY) => {
-  return Math.round(rY * 40) - 20;
+  let deg = Math.round(rY * 40);
+  if (deg < 0) deg = 0;
+  if (deg > 40) deg = 40;
+  return deg - 20;
 }
 
 function draw() {
