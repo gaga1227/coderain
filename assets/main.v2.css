@@ -87,4 +87,5 @@ body, .full-layer {
   display: block;
   backface-visibility: hidden;
   perspective: 50em;
+  transform-origin: 50% 50%;
 }
