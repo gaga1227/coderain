@@ -357,8 +357,8 @@ const drawFrameRate = throttle(() => {
  */
 const getTrasformOriginX = (rY) => {
   const pct = Math.round(rY * 100);
-  if (pct) < 0 pct = 0;
-  if (pct) > 100 pct = 100;
+  if (pct < 0) pct = 0;
+  if (pct > 100) pct = 100;
   return pct;
 }
 const getTrasformOriginY = (rX) => {
