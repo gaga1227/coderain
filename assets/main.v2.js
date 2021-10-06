@@ -361,7 +361,7 @@ const drawFrameRate = throttle(() => {
  */
 const getClampedRotate = (rotation = 0) => {
   if (isNaN(rotation)) return;
-  let deg = Math.round(rotation);
+  let deg = roundDecimals(rotation, 8);
   // add clamps
   if (deg < -20) deg = -20;
   if (deg > 20) deg = 20;
@@ -369,7 +369,7 @@ const getClampedRotate = (rotation = 0) => {
 };
 const getTransformOrigin = (clampedRotation = 0, flip = false) => {
   const rotation = clampedRotation + 20; // 0 ~ 40
-  let pct = Math.abs(Math.round(rotation / 40 * 100));
+  let pct = Math.abs(roundDecimals(rotation / 40 * 100, 8));
   if (pct < 0) pct = 0;
   if (pct > 100) pct = 100;
   return flip ? (100 - pct) : pct;

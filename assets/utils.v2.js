@@ -42,3 +42,11 @@ const isFirefox = () => {
   const userAgent = (navigator && navigator.userAgent || '').toLowerCase();
   return userAgent.match(/(?:firefox|fxios)\/(\d+)/) !== null;
 };
+
+/**
+ * roundDecimals
+ */
+const roundDecimals = (float = 0, decimals = 2) => {
+  const factor = Math.pow(10, decimals);
+  return Math.round((float + Number.EPSILON) * factor) / factor;
+};
