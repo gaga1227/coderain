@@ -385,10 +385,10 @@ const updateRotations = () => {
   const transformOriginX = getTransformOrigin(clampedRY);
   const transformOriginY = getTransformOrigin(clampedRX, true);
 
-  console.log('clampedRX', clampedRX);
-  console.log('clampedRY', clampedRY);
-  console.log('transformOriginX', transformOriginX);
-  console.log('transformOriginY', transformOriginY);
+  // console.log('clampedRX', clampedRX);
+  // console.log('clampedRY', clampedRY);
+  // console.log('transformOriginX', transformOriginX);
+  // console.log('transformOriginY', transformOriginY);
 
   renderer.elt.style.transform = `perspective(50em) rotateX(${clampedRX}deg) rotateY(${clampedRY}deg)`;
   renderer.elt.style.transformOrigin = `${transformOriginX}% ${transformOriginY}%`;
