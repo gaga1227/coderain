@@ -50,7 +50,7 @@ const getConfigs = () => {
     DEBUG: false,
     FRAMERATE: 60,
     SHAKEN_THRESH: 30,
-    ROTATIONS: false,
+    ROTATIONS: true, // TODO: consider better interaction mode?
 
     // setting
     SETTING: 0,
@@ -266,14 +266,10 @@ const initStreams = () => {
 const handleDocMouseUp = (e) => {
   // FireFox crashes with 'shadowBlur', disabled
   !ENV.isFirefox && (rendererCtx.shadowBlur = 0);
-
-  CONFIGS.ROTATIONS = false;
 };
 const handleDocMouseDown = (e) => {
   // FireFox crashes with 'shadowBlur', disabled
   !ENV.isFirefox && (rendererCtx.shadowBlur = CONFIGS.GLOW_LEVEL);
-
-  CONFIGS.ROTATIONS = true;
 };
 const handleDocClick = (e) => {
   // TODO: use 'prevSetting' depends on screen location
