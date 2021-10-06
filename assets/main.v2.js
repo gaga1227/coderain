@@ -377,7 +377,7 @@ const getTransformOrigin = (clampedRotation = 0, flip = false) => {
 const applyRotations = (rX, rY, toX, toY) => {
   if (!renderer || !renderer.elt) return;
   const node = renderer.elt;
-  node.style.transform = `perspective(40em) rotateX(${rX}deg) rotateY(${rY}deg)`;
+  node.style.transform = `perspective(60em) rotateX(${rX}deg) rotateY(${rY}deg)`;
   node.style.transformOrigin = `${toX}% ${toY}%`;
 };
 const updateRotations = () => {
