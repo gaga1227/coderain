@@ -51,6 +51,7 @@ const getConfigs = () => {
     FRAMERATE: 60,
     SHAKEN_THRESH: 30,
     ROTATIONS: true, // TODO: consider better interaction mode?
+    FLAT_X_ANGLE: 40, // offsets 0 degree for rotation X 
 
     // setting
     SETTING: 0,
@@ -357,6 +358,7 @@ const drawFrameRate = throttle(() => {
  */
 const getClampedRotate = (rotation = 0, flip = false) => {
   if (isNaN(rotation)) return;
+  rotation -= CONFIGS.FLAT_X_ANGLE;
   let deg = roundDecimals(rotation, 8);
   // add clamps
   if (deg < -20) deg = -20;
@@ -377,7 +379,7 @@ const getTransformOrigin = (clampedRotation = 0, flip = false) => {
 const applyRotations = (rX, rY, toX, toY) => {
   if (!renderer || !renderer.elt) return;
   const node = renderer.elt;
-  node.style.transform = `perspective(50em) rotateX(${rX}deg) rotateY(${rY}deg)`;
+  node.style.transform = `perspective(40em) rotateX(${rX}deg) rotateY(${rY}deg)`;
   node.style.transformOrigin = `${toX}% ${toY}%`;
 };
 const updateRotations = () => {
