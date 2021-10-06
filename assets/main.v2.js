@@ -378,6 +378,12 @@ const getTransformOrigin = (clampedRotation = 0, flip = false) => {
   if (pct > 100) pct = 100;
   return flip ? (100 - pct) : pct;
 };
+const applyRotations = (rX, rY, toX, toY) => {
+  const node = renderer.elt;
+  if (!node) return;
+  node.style.transform = `perspective(50em) rotateX(${rX}deg) rotateY(${rY}deg)`;
+  node.style.transformOrigin = `${toX}% ${toY}%`;
+};
 const updateRotations = () => {
   if (!CONFIGS.ROTATIONS) return;
   if (!renderer || !renderer.elt) return;
@@ -389,13 +395,11 @@ const updateRotations = () => {
   const transformOriginX = getTransformOrigin(clampedRY);
   const transformOriginY = getTransformOrigin(clampedRX, true);
 
+  applyRotations(clampedRX, clampedRY, transformOriginX, transformOriginY);
   // console.log('clampedRX', clampedRX);
   // console.log('clampedRY', clampedRY);
   // console.log('transformOriginX', transformOriginX);
   // console.log('transformOriginY', transformOriginY);
-
-  renderer.elt.style.transform = `perspective(50em) rotateX(${clampedRX}deg) rotateY(${clampedRY}deg)`;
-  renderer.elt.style.transformOrigin = `${transformOriginX}% ${transformOriginY}%`;
 };
 
 function draw() {
@@ -443,4 +447,7 @@ function deviceShaken() {
   // reset view
   MSG.clearMsg();
   rainStreams = [...initStreams()];
+
+  // reset rotation
+  applyRotations(0, 0, 50, 50);
 }
