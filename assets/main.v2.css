@@ -85,7 +85,7 @@ body, .full-layer {
 }
 
 #mainRenderer {
-  background: #FF00FF;
+  /*background: #FF00FF;*/
   display: block;
   backface-visibility: hidden;
   transform-origin: 50% 50%;
