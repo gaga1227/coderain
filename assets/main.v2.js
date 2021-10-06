@@ -359,29 +359,20 @@ const drawFrameRate = throttle(() => {
 /**
  * Rotations
  */
-const getTransformOriginX = (rY) => {
-  let pct = Math.round(rY * 100);
+const getClampedRotate = (rotation = 0) => {
+  if (isNaN(rotation)) return;
+  let deg = Math.round(rotation);
+  // add clamps
+  if (deg < -20) deg = -20;
+  if (deg > 20) deg = 20;
+  return deg;
+};
+const getTransformOrigin = (clampedRotation = 0) => {
+  const rotation = clampedRotation + 20; // 0 ~ 40
+  let pct = Math.round(rotation / 40 * 100);
   if (pct < 0) pct = 0;
   if (pct > 100) pct = 100;
   return pct;
-};
-const getTransformOriginY = (rX) => {
-  let pct = Math.round((1 - rX) * 100);
-  if (pct < 0) pct = 0;
-  if (pct > 100) pct = 100;
-  return pct;
-};
-const getRotateX = (rX) => {
-  let deg = Math.round(rX * 40);
-  if (deg < 0) deg = 0;
-  if (deg > 40) deg = 40;
-  return deg - 20;
-};
-const getRotateY = (rY) => {
-  let deg = Math.round(rY * 40);
-  if (deg < 0) deg = 0;
-  if (deg > 40) deg = 40;
-  return deg - 20;
 };
 const updateRotations = () => {
   if (!CONFIGS.ROTATIONS) return;
@@ -389,11 +380,18 @@ const updateRotations = () => {
 
   const rX = rotationX;
   const rY = rotationY;
-  console.log('rotationX', rotationX);
-  console.log('rotationY', rotationY);
+  const clampedRX = getClampedRotate(rX);
+  const clampedRY = getClampedRotate(rY);
+  const transformOriginX = getTransformOrigin(clampedRX);
+  const transformOriginY = getTransformOrigin(clampedRY);
 
-  // renderer.elt.style.transform = `perspective(50em) rotateX(${getRotateX(rX)}deg) rotateY(${getRotateY(rY)}deg)`;
-  // renderer.elt.style.transformOrigin = `${getTransformOriginX(rY)}% ${getTransformOriginY(rX)}%`;
+  console.log('clampedRX', clampedRX);
+  console.log('clampedRY', clampedRY);
+  console.log('transformOriginX', transformOriginX);
+  console.log('transformOriginY', transformOriginY);
+
+  // renderer.elt.style.transform = `perspective(50em) rotateX(${clampedRX}deg) rotateY(${clampedRY}deg)`;
+  // renderer.elt.style.transformOrigin = `${transformOriginX}% ${transformOriginY}%`;
 };
 
 function draw() {
