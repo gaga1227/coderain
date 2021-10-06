@@ -50,6 +50,7 @@ const getConfigs = () => {
     DEBUG: false,
     FRAMERATE: 60,
     SHAKEN_THRESH: 30,
+    ROTATIONS: false,
 
     // setting
     SETTING: 0,
@@ -265,10 +266,14 @@ const initStreams = () => {
 const handleDocMouseUp = (e) => {
   // FireFox crashes with 'shadowBlur', disabled
   !ENV.isFirefox && (rendererCtx.shadowBlur = 0);
+
+  CONFIGS.ROTATIONS = false;
 };
 const handleDocMouseDown = (e) => {
   // FireFox crashes with 'shadowBlur', disabled
   !ENV.isFirefox && (rendererCtx.shadowBlur = CONFIGS.GLOW_LEVEL);
+
+  CONFIGS.ROTATIONS = true;
 };
 const handleDocClick = (e) => {
   // TODO: use 'prevSetting' depends on screen location
@@ -349,39 +354,46 @@ function setup() {
  */
 const drawFrameRate = throttle(() => {
   debugNode.textContent = '' + Math.round(frameRate());
-  
-  console.log('mouseX', mouseX);
-  console.log('mouseY', mouseY);
 }, 500);
-
 
 /**
  * Rotations
  */
-const getTrasformOriginX = (rY) => {
+const getTransformOriginX = (rY) => {
   let pct = Math.round(rY * 100);
   if (pct < 0) pct = 0;
   if (pct > 100) pct = 100;
   return pct;
-}
-const getTrasformOriginY = (rX) => {
+};
+const getTransformOriginY = (rX) => {
   let pct = Math.round((1 - rX) * 100);
   if (pct < 0) pct = 0;
   if (pct > 100) pct = 100;
   return pct;
-}
+};
 const getRotateX = (rX) => {
   let deg = Math.round(rX * 40);
   if (deg < 0) deg = 0;
   if (deg > 40) deg = 40;
   return deg - 20;
-}
+};
 const getRotateY = (rY) => {
   let deg = Math.round(rY * 40);
   if (deg < 0) deg = 0;
   if (deg > 40) deg = 40;
   return deg - 20;
-}
+};
+const updateRotations = () => {
+  if (!CONFIGS.ROTATIONS) return;
+
+  const rX = rotationX;
+  const rY = rotationY;
+  console.log('rotationX', rotationX);
+  console.log('rotationY', rotationY);
+
+  renderer.elt.style.transform = `perspective(50em) rotateX(${getRotateX(rX)}deg) rotateY(${getRotateY(rY)}deg)`;
+  renderer.elt.style.transformOrigin = `${getTransformOriginX(rY)}% ${getTransformOriginY(rX)}%`;
+};
 
 function draw() {
   if (CONFIGS.DEBUG) {
@@ -390,12 +402,8 @@ function draw() {
 
   clear();
   rainStreams.forEach(s => s.draw()); // redraw all streams
-  
-  // Rotations
-  const rX = mouseX / window.innerWidth;
-  const rY = mouseY / window.innerHeight;
-  renderer.elt.style.transform = `perspective(50em) rotateX(${getRotateX(rX)}deg) rotateY(${getRotateY(rY)}deg)`;
-  renderer.elt.style.transformOrigin = `${getTrasformOriginX(rY)}% ${getTrasformOriginY(rX)}%`;
+
+  updateRotations(); // update interactive rotations
 }
 
 /**

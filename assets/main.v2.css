@@ -41,9 +41,11 @@ body, .full-layer {
   z-index: 99;
   opacity: 0;
 }
+
 #debugNode[data-enabled="true"] {
   opacity: 1;
 }
+
 #debugNode::before {
   content: 'FPS:';
 }
