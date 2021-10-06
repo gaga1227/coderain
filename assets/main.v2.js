@@ -392,8 +392,8 @@ const updateRotations = () => {
   console.log('rotationX', rotationX);
   console.log('rotationY', rotationY);
 
-  renderer.elt.style.transform = `perspective(50em) rotateX(${getRotateX(rX)}deg) rotateY(${getRotateY(rY)}deg)`;
-  renderer.elt.style.transformOrigin = `${getTransformOriginX(rY)}% ${getTransformOriginY(rX)}%`;
+  // renderer.elt.style.transform = `perspective(50em) rotateX(${getRotateX(rX)}deg) rotateY(${getRotateY(rY)}deg)`;
+  // renderer.elt.style.transformOrigin = `${getTransformOriginX(rY)}% ${getTransformOriginY(rX)}%`;
 };
 
 function draw() {
