@@ -385,6 +385,7 @@ const getRotateY = (rY) => {
 };
 const updateRotations = () => {
   if (!CONFIGS.ROTATIONS) return;
+  if (!renderer || !renderer.elt) return;
 
   const rX = rotationX;
   const rY = rotationY;
@@ -412,7 +413,7 @@ function draw() {
 const onWindowResize = debounce(() => {
   CONFIGS = getConfigs();
 
-  renderer = resizeCanvas(window.innerWidth, window.innerHeight);
+  resizeCanvas(window.innerWidth, window.innerHeight);
   rainStreams = [...initStreams()];
 
   // resume continuous drawing
