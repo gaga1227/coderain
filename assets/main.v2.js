@@ -51,7 +51,6 @@ const getConfigs = () => {
     FRAMERATE: 60,
     SHAKEN_THRESH: 30,
     ROTATIONS: true, // TODO: consider better interaction mode?
-    FLAT_X_ANGLE: 40, // offsets 0 degree for rotation X 
 
     // setting
     SETTING: 0,
@@ -358,7 +357,6 @@ const drawFrameRate = throttle(() => {
  */
 const getClampedRotate = (rotation = 0, flip = false) => {
   if (isNaN(rotation)) return;
-  rotation -= CONFIGS.FLAT_X_ANGLE;
   let deg = roundDecimals(rotation, 8);
   // add clamps
   if (deg < -20) deg = -20;
