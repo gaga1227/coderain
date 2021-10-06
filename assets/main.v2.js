@@ -367,12 +367,12 @@ const getClampedRotate = (rotation = 0) => {
   if (deg > 20) deg = 20;
   return deg;
 };
-const getTransformOrigin = (clampedRotation = 0) => {
+const getTransformOrigin = (clampedRotation = 0, flip = false) => {
   const rotation = clampedRotation + 20; // 0 ~ 40
-  let pct = Math.round(rotation / 40 * 100);
+  let pct = Math.abs(Math.round(rotation / 40 * 100));
   if (pct < 0) pct = 0;
   if (pct > 100) pct = 100;
-  return pct;
+  return flip ? (100 - pct) : pct;
 };
 const updateRotations = () => {
   if (!CONFIGS.ROTATIONS) return;
@@ -382,8 +382,8 @@ const updateRotations = () => {
   const rY = rotationY;
   const clampedRX = getClampedRotate(rX);
   const clampedRY = getClampedRotate(rY);
-  const transformOriginX = getTransformOrigin(clampedRX);
-  const transformOriginY = getTransformOrigin(clampedRY);
+  const transformOriginX = getTransformOrigin(clampedRY);
+  const transformOriginY = getTransformOrigin(clampedRX, true);
 
   console.log('clampedRX', clampedRX);
   console.log('clampedRY', clampedRY);
@@ -391,7 +391,7 @@ const updateRotations = () => {
   console.log('transformOriginY', transformOriginY);
 
   renderer.elt.style.transform = `perspective(50em) rotateX(${clampedRX}deg) rotateY(${clampedRY}deg)`;
-  // renderer.elt.style.transformOrigin = `${transformOriginX}% ${transformOriginY}%`;
+  renderer.elt.style.transformOrigin = `${transformOriginX}% ${transformOriginY}%`;
 };
 
 function draw() {
