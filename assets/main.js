@@ -15,7 +15,7 @@ const SETTINGS = [
   {speed: 1.6, prompt: 'warming up'},
   {speed: 3, prompt: 'let it rain'},
   {speed: 6, prompt: 'john wick'},
-  {speed: 12, prompt: 'warp'},
+  {speed: 12, prompt: 'hyperdrive'},
 ];
 const prevSetting = () => {
   const currentSetting = CONFIGS.SETTING;
